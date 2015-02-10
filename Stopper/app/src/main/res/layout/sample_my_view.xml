@@ -1,0 +1,120 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:clickable="true"
+    android:visibility="visible"
+    android:id="@+id/mainLayout">
+
+    <com.example.n971873.stopper.MyView android:background="#ccc" android:layout_width="150dp"
+        android:layout_height="150dp" android:paddingStart="20dp" android:paddingBottom="40dp"
+        app:exampleDimension="24sp" app:exampleColor="#33b5e5" app:exampleString="Hello, MyView"
+        app:exampleDrawable="@android:drawable/ic_menu_add"
+        android:id="@+id/oraView"
+        android:minHeight="150dp"
+        android:minWidth="150dp" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonUp"
+        android:id="@+id/buttonMinuteUp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/oraView"
+        android:layout_marginLeft="20dp"
+        android:clickable="true"
+        android:enabled="false"
+        android:nestedScrollingEnabled="true"
+        android:longClickable="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonUp"
+        android:id="@+id/buttonSecondUp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/buttonMinuteUp"
+        android:enabled="false"
+        android:clickable="true"
+        android:longClickable="true" />
+
+
+    <EditText
+        android:layout_width="124dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:layout_gravity="end|top"
+        android:enabled="false"
+        android:singleLine="true"
+        android:text="@string/digitalClockInit"
+        android:textSize="25sp"
+        android:textColor="@color/primary_text_default_material_light"
+        android:layout_toRightOf="@id/oraView"
+        android:layout_below="@id/buttonMinuteUp"
+        android:layout_alignLeft="@id/buttonMinuteUp"
+        />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonDown"
+        android:id="@+id/buttonMinuteDown"
+        android:layout_alignLeft="@id/editText"
+        android:layout_below="@id/editText"
+        android:enabled="false"
+        android:clickable="true"
+        android:longClickable="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonDown"
+        android:id="@+id/buttonSecondDown"
+        android:layout_alignTop="@id/buttonMinuteDown"
+        android:layout_alignLeft="@id/buttonSecondUp"
+        android:clickable="true"
+        android:enabled="false" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonStart"
+        android:id="@+id/button"
+        android:layout_gravity="start|center_vertical"
+        android:onClick="oraStart"
+        android:layout_below="@id/oraView"
+        android:layout_margin="10dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonStopper"
+        android:id="@+id/stopperButton"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:enabled="false"
+        android:onClick="stopperClick"
+        android:layout_toRightOf="@id/button"
+        android:layout_below="@id/oraView"
+        android:layout_margin="10dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonTimer"
+        android:id="@+id/timerButton"
+        android:layout_gravity="end|center_vertical"
+        android:onClick="timerClick"
+        android:enabled="true"
+        android:clickable="true"
+        android:layout_toRightOf="@id/stopperButton"
+        android:layout_below="@id/oraView"
+        android:layout_margin="10dp" />
+
+
+
+</RelativeLayout>
