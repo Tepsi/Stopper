@@ -5,12 +5,12 @@ import android.view.View;
 /**
  * Created by N971873 on 2015.02.06..
  */
-public class ButtonRunnable implements Runnable{
+class ButtonRunnable implements Runnable{
     private View view;
-    private MyApplication application;
-    public ButtonRunnable(View inView, MyApplication inApplication) {
+    private Globals globals;
+    public ButtonRunnable(View inView) {
         view=inView;
-        application=inApplication;
+        globals=Globals.getInstance();
     }
 
     public void run() {
@@ -31,7 +31,7 @@ public class ButtonRunnable implements Runnable{
             default:
                 changeRate=0;
         }
-        application.myView.setTimerMaxOra(application.myView.getTimerMaxOra()+changeRate);
+        globals.setTimerMaxOra(globals.getTimerMaxOra()+changeRate);
 
     }
 }

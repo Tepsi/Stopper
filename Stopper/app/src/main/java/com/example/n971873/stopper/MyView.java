@@ -16,17 +16,10 @@ public class MyView extends View {
     private Paint paint;
     private Paint paintHand;
     private Paint paintArc;
-    private long timerMaxOra;
-    private long stopperMaxOra;
     private long centerX;
     private long centerY;
     private long radius;
     private RectF rectangle;
-    private long startTime;
-    private boolean menet;
-    private double prevSzog = 0;
-    public boolean timer;
-    private boolean defaultState;
     private Globals globals;
 
     public MyView(Context context) {
@@ -59,27 +52,11 @@ public class MyView extends View {
 
         Paint paintArc2 = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintArc2.setColor(Color.RED);
-
-        timer = false;
         rectangle = new RectF(0, 0, 0, 0);
-        setTimerMaxOra(MAXORA);
-        setStopperMaxOra(MAXORA);
-
-        setDefaultState(true);
 
         globals = Globals.getInstance();
-        globals.getTimerMaxOra();
-    }
+        globals.timer = false;
 
-    public void initStart() {
-        setStartTime(System.currentTimeMillis());
-        menet = true;
-        prevSzog = 0;
-        setDefaultState(false);
-    }
-
-    public void setDefaultState(boolean inFlag) {
-        defaultState = inFlag;
     }
 
     @Override
@@ -96,26 +73,10 @@ public class MyView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        double szog;
-        int szog2;
         super.onDraw(canvas);
 
-        if (defaultState) {
-            szog = 0;
-            szog2 = 0;
-        } else {
-            if (timer) {
-                szog = (float) ((getTimerMaxOra() - getElapsedTime()) % getTimerMaxOra()) / getTimerMaxOra() * 2 * Math.PI;
-                szog2 = Math.round((float) (getTimerMaxOra() - getElapsedTime()) % getTimerMaxOra() / getTimerMaxOra() * 360);
-            } else {
-                szog = (float) (getElapsedTime() % getStopperMaxOra()) / getStopperMaxOra() * 2 * Math.PI;
-                if (szog < prevSzog) menet = !menet;
-                prevSzog = szog;
-                szog2 = Math.round((float) getElapsedTime() % getStopperMaxOra() / getStopperMaxOra() * 360);
-            }
-        }
-        double fx = Math.sin(szog) * radius;
-        double fy = Math.cos(szog) * radius;
+        double fx = Math.sin(globals.szog) * radius;
+        double fy = Math.cos(globals.szog) * radius;
         fy *= -1;
         fx += centerX;
         fy += centerY;
@@ -123,42 +84,9 @@ public class MyView extends View {
         canvas.drawCircle(centerX, centerY, radius, paint);
         canvas.drawLine(centerX, centerY, Math.round(fx), Math.round(fy), paintHand);
 
-        if (menet) canvas.drawArc(rectangle, 270, szog2, true, paintArc);
-        else canvas.drawArc(rectangle, szog2 + 270 % 360, 360 - szog2, true, paintArc);
-        Singleton kaki=Singleton.getInstance();
+        if (globals.menet) canvas.drawArc(rectangle, 270, globals.szog2, true, paintArc);
+        else canvas.drawArc(rectangle, globals.szog2 + 270 % 360, 360 - globals.szog2, true, paintArc);
     }
 
-
-    public long getStopperMaxOra() {
-        return stopperMaxOra;
-    }
-
-    public void setStopperMaxOra(long maxOra) {
-        this.stopperMaxOra = maxOra;
-        if (this.stopperMaxOra < 1000) this.stopperMaxOra = 1000;
-    }
-
-    public long getTimerMaxOra() {
-        return timerMaxOra;
-    }
-
-    public void setTimerMaxOra(long maxOra) {
-        this.timerMaxOra = maxOra;
-        if (this.timerMaxOra < 1000) this.timerMaxOra = 1000;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public long getElapsedTime() {
-        long elapsedTime = System.currentTimeMillis() - getStartTime();
-        if (timer && elapsedTime > getTimerMaxOra()) return getTimerMaxOra();
-        else return elapsedTime;
-    }
 }
 

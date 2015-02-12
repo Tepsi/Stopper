@@ -22,30 +22,31 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 //    private final String TAG="MainActivity";
     private final String TAG=this.toString();
     private final long MAXORA=60000;
-    private MyApplication application;
     private SharedPreferences settings;
+    private Globals globals;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        application = (MyApplication) this.getApplication();
-        application.oraStarted = false;
+        globals=Globals.getInstance();
+        globals.oraStarted = false;
         setContentView(R.layout.sample_my_view);
-        application.editText=(EditText) findViewById(R.id.editText);
-        application.myView = (MyView) findViewById(R.id.oraView);
-        application.button = (Button) findViewById(R.id.button);
+        globals.editText=(EditText) findViewById(R.id.editText);
+        globals.myView = (MyView) findViewById(R.id.oraView);
+        globals.button = (Button) findViewById(R.id.button);
         settings = getPreferences(MODE_PRIVATE);
-        application.myView.setTimerMaxOra(settings.getLong("timerMaxOra",MAXORA));
-        application.mainActivity=this;
+        globals.setTimerMaxOra(settings.getLong("timerMaxOra",MAXORA));
+        globals.setStopperMaxOra(MAXORA);
+        globals.setDefaultState(true);
         Button buttonMinuteUp = (Button) findViewById(R.id.buttonMinuteUp);
         Button buttonMinuteDown = (Button) findViewById(R.id.buttonMinuteDown);
         Button buttonSecondUp = (Button) findViewById(R.id.buttonSecondUp);
         Button buttonSecondDown = (Button) findViewById(R.id.buttonSecondDown);
         buttonMinuteDown.setOnTouchListener(this);
         buttonMinuteUp.setOnTouchListener(this);
-        buttonMinuteDown.setOnTouchListener(this);
-        buttonMinuteUp.setOnTouchListener(this);
+        buttonSecondDown.setOnTouchListener(this);
+        buttonSecondUp.setOnTouchListener(this);
     }
 
 
@@ -78,32 +79,31 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         Button timerButton = (Button) findViewById(R.id.timerButton);
         Button stopperButton = (Button) findViewById(R.id.stopperButton);
         String TAG = "MainActivity";
-        if (application.oraStarted) {
+        if (globals.oraStarted) {
             Log.d(TAG,"Ora stopped");
             stopService(new Intent(this, OraService.class));
-            application.oraStarted = false;
+            globals.oraStarted = false;
             button.setText(R.string.buttonStart);
-            timerButton.setEnabled(!application.myView.timer);
-            stopperButton.setEnabled(application.myView.timer);
+            timerButton.setEnabled(!globals.timer);
+            stopperButton.setEnabled(globals.timer);
             switchTimeSelector(true);
-            application.myView.invalidate();
-            if (application.myView.timer) refreshDigitalClock(application.myView.getTimerMaxOra());
+            globals.myView.invalidate();
+            if (globals.timer) refreshDigitalClock(globals.getTimerMaxOra());
 
         }
         else {
             Log.d(TAG,"Ora started");
-            application.myView.setStartTime(System.currentTimeMillis());
+            globals.setStartTime(System.currentTimeMillis());
             button.setText(R.string.buttonStop);
-            application.oraStarted = true;
-            application.stop = false;
-            application.myView.initStart();
+            globals.oraStarted = true;
+            globals.stop = false;
             startService(new Intent(this, OraService.class));
             stopperButton.setEnabled(false);
             timerButton.setEnabled(false);
             switchTimeSelector(false);
-            if (application.myView.timer) {
+            if (globals.timer) {
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putLong("timerMaxOra",application.myView.getTimerMaxOra());
+                editor.putLong("timerMaxOra",globals.getTimerMaxOra());
                 editor.apply();
             }
 
@@ -117,7 +117,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         Button buttonMinuteDown = (Button) findViewById(R.id.buttonMinuteDown);
         Button buttonSecondUp = (Button) findViewById(R.id.buttonSecondUp);
         Button buttonSecondDown = (Button) findViewById(R.id.buttonSecondDown);
-        if (!application.myView.timer) flag=false;
+        if (!globals.timer) flag=false;
         buttonMinuteUp.setEnabled(flag);
         buttonMinuteDown.setEnabled(flag);
         buttonSecondUp.setEnabled(flag);
@@ -129,9 +129,10 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         Button stopperButton = (Button) findViewById(R.id.stopperButton);
         stopperButton.setEnabled(true);
         timerButton.setEnabled(false);
-        application.myView.timer=true;
+        globals.timer=true;
         switchTimeSelector(true);
-        refreshDigitalClock(application.myView.getTimerMaxOra());
+        globals.setTimerMaxOra(globals.getTimerMaxOra());
+        refreshDigitalClock(globals.getTimerMaxOra());
     }
 
     public void stopperClick(View view) {
@@ -139,37 +140,37 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         Button stopperButton = (Button) findViewById(R.id.stopperButton);
         stopperButton.setEnabled(false);
         timerButton.setEnabled(true);
-        application.myView.timer=false;
+        globals.timer=false;
         switchTimeSelector(false);
-        application.myView.setTimerMaxOra(60000);
+        globals.setTimerMaxOra(globals.getStopperMaxOra());
+        refreshDigitalClock(0);
     }
 
     private void refreshDigitalClock() {
         long maxOra;
-        if (application.myView.timer) maxOra=application.myView.getTimerMaxOra();
-        else maxOra=application.myView.getStopperMaxOra();
+        if (globals.timer) maxOra=globals.getTimerMaxOra();
+        else maxOra=globals.getStopperMaxOra();
         long minute = TimeUnit.MILLISECONDS.toMinutes(maxOra);
         long second = Math.round((maxOra-60000*minute)/1000);
-        application.editText.setText(String.format(
+        globals.editText.setText(String.format(
                 "%02d:%02d:%03d",minute,second,maxOra%1000));
     }
 
     private void refreshDigitalClock(long time) {
         long minute = TimeUnit.MILLISECONDS.toMinutes(time);
         long second = Math.round((time-60000*minute)/1000);
-        application.editText.setText(String.format(
+        globals.editText.setText(String.format(
                 "%02d:%02d:%03d",minute,second,time%1000));
     }
 
     public boolean onTouch(View inView, MotionEvent event) {
-        long changeRate;
         Handler handler=null;
         ButtonRunnable action=null;
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
                 if (handler==null) {
                     handler=new Handler();
-                    action = new ButtonRunnable(inView,application);
+                    action = new ButtonRunnable(inView);
                     handler.postDelayed(action,500);
                 }
                 break;
@@ -180,6 +181,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                     handler=null;
                 }
         }
+        refreshDigitalClock();
         return true;
     }
 

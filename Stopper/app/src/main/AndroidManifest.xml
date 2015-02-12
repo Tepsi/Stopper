@@ -3,7 +3,6 @@
     package="com.example.n971873.stopper" >
 
     <application
-        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -20,8 +19,8 @@
         <service
             android:name=".OraService"
             android:enabled="true"
-            android:exported="true"
-            android:stopWithTask="true">
+            android:exported="false"
+            >
         </service>
 
     </application>
